@@ -50,7 +50,7 @@
 
       <div class="form-label-group mb-3">
         <label for="password-check">Password Check</label>
-        <input
+        <input0
           id="password-check"
           v-model="passwordCheck"
           name="passwordCheck"
