@@ -5,7 +5,10 @@
     <RestaurantDetail :initialRestaurant="restaurant" />
     <hr />
     <!-- 餐廳評論 RestaurantComments -->
-    <RestaurantComments :restaurant-comments="restaurantComments" />
+    <RestaurantComments
+      :restaurant-comments="restaurantComments"
+      @after-delete-comment="afterDeleteComment"
+    />
     <!-- 新增評論 CreateComment -->
   </div>
 </template>
@@ -116,6 +119,13 @@ export default {
       };
 
       this.restaurantComments = Comments;
+    },
+    afterDeleteComment(commentId) {
+      // 以 filter 保留未被選擇的 comment.id
+      // 在父元件Restaurant.vue請求伺服器刪除資料 或 在子元件 RestaurantComments.vue請求伺服器刪除資料 兩者有差別嗎?
+      this.restaurantComments = this.restaurantComments.filter(
+        comment => comment.id !== commentId
+      );
     }
   }
 };
