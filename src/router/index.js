@@ -4,6 +4,7 @@ import NotFound from '../views/NotFound.vue'
 import SignIn from '../views/SignIn.vue'
 import Restaurants from '../views/Restaurants.vue'
 
+
 Vue.use(VueRouter)
 
 const routes = [
@@ -36,6 +37,11 @@ const routes = [
     path: '/restaurants/top',
     name: 'restaurants-tops',
     component: () => import('../views/RestaurantsTop.vue')
+  },
+  {
+    path: '/restaurants/:id',
+    name: 'restaurant',
+    component: () => import('../views/Restaurant.vue')
   },
   {
     path: '/users/top',
