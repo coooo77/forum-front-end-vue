@@ -13,7 +13,7 @@
         <h3>
           <a href="#">{{comment.User.name}}</a>
         </h3>
-        <p>{{comment.text}}}</p>
+        <p>{{comment.text}}</p>
         <footer class="blockquote-footer">{{ comment.createdAt | fromNow }}</footer>
       </blockquote>
       <hr />
