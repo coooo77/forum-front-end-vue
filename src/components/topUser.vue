@@ -1,7 +1,7 @@
 <template>
   <div class="col-3">
     <a href="#">
-      <img :src="topUser.image" width="180px" height="180px" />
+      <img :src="topUser.image | emptyImage" width="180px" height="180px" />
     </a>
     <h2>{{user.name}}</h2>
     <span class="badge badge-secondary">追蹤人數：{{topUser.FollowerCount}}</span>
@@ -18,7 +18,9 @@
 </template>
 
 <script>
+import { emptyImageFilter } from "./../utils/mixins";
 export default {
+  mixins: [emptyImageFilter],
   props: {
     user: {
       type: Object,
