@@ -21,7 +21,11 @@
 
           <a href="#" class="btn btn-link">Edit</a>
 
-          <button type="button" class="btn btn-link">Delete</button>
+          <button
+            type="button"
+            class="btn btn-link"
+            @click.stop.prevent="deleteRestaurant(restaurant.id)"
+          >Delete</button>
         </td>
       </tr>
     </tbody>
@@ -845,6 +849,11 @@ export default {
   methods: {
     fetchRestaurants() {
       this.restaurants = dummyData.restaurants;
+    },
+    deleteRestaurant(restaurantId) {
+      this.restaurants = this.restaurants.filter(
+        restaurant => restaurant.id !== restaurantId
+      );
     }
   }
 };
