@@ -25,14 +25,11 @@
             </li>
           </ul>
           <p></p>
-          <form
+          <router-link
             v-if="currentUser.id === profile.id"
-            action="/following/3"
-            method="POST"
-            style="display: contents;"
-          >
-            <button type="submit" class="btn btn-primary">Edit</button>
-          </form>
+            class="btn btn-primary btn-border mr-2"
+            :to="{ name: 'user-edit', params: { id: currentUser.id }} "
+          >Edit</router-link>
           <form
             v-else-if="isFollowed"
             action="/following/3"
