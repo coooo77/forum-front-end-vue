@@ -34,7 +34,11 @@
         />
       </div>
 
-      <button class="btn btn-lg btn-primary btn-block mb-3" type="submit">Submit</button>
+      <button
+        class="btn btn-lg btn-primary btn-block mb-3"
+        type="submit"
+        :disabled="isProcessing"
+      >Submit</button>
 
       <div class="text-center mb-3">
         <p>
@@ -55,7 +59,8 @@ export default {
   data() {
     return {
       email: "",
-      password: ""
+      password: "",
+      isProcessing: false
     };
   },
   methods: {
@@ -69,6 +74,8 @@ export default {
         });
         return;
       }
+
+      this.isProcessing = true;
 
       authorizationAPI
         .signIn({
@@ -86,6 +93,7 @@ export default {
           localStorage.setItem("token", data.token);
 
           // 成功登入後轉址到餐聽首頁
+          // 因為成功登入就會轉址，所以不用還原 isProcessing 的狀態
           this.$router.push("/restaurants");
         })
         .catch(error => {
@@ -93,6 +101,8 @@ export default {
             icon: "warning",
             title: "請確認您輸入了正確的帳號密碼"
           });
+          // 因為登入失敗，所以要把按鈕狀態還原
+          this.isProcessing = false;
           console.log("error", error);
         });
     }
