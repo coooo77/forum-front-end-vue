@@ -64,47 +64,76 @@ export default {
     };
   },
   methods: {
-    handleSubmit() {
-      // 如果 email 或 password 為空，則使用 Toast 提示
-      // 然後 return 不繼續往後執行
-      if (!this.email || !this.password) {
-        Toast.fire({
-          icon: "warning",
-          title: "請填入 email 和 password"
-        });
-        return;
-      }
-
-      this.isProcessing = true;
-
-      authorizationAPI
-        .signIn({
-          email: this.email,
-          password: this.password
-        })
-        .then(response => {
-          console.log("response", response);
-          // 取得 API 請求後的資料
-          const { data } = response;
-          if (data.status !== "success") {
-            throw new Error(data.message);
-          }
-          // 將 token 存放在 localStorage 內
-          localStorage.setItem("token", data.token);
-
-          // 成功登入後轉址到餐聽首頁
-          // 因為成功登入就會轉址，所以不用還原 isProcessing 的狀態
-          this.$router.push("/restaurants");
-        })
-        .catch(error => {
+    async handleSubmit() {
+      try {
+        if (!this.email || !this.password) {
           Toast.fire({
             icon: "warning",
-            title: "請確認您輸入了正確的帳號密碼"
+            title: "請填入 email 和 password"
           });
-          // 因為登入失敗，所以要把按鈕狀態還原
-          this.isProcessing = false;
-          console.log("error", error);
+          return;
+        }
+        this.isProcessing = true;
+
+        const response = await authorizationAPI.signIn({
+          email: this.email,
+          password: this.password
         });
+        console.log("response", response);
+        const { data } = response;
+        if (data.status !== "success") {
+          throw new Error(data.message);
+        }
+        localStorage.setItem("token", data.token);
+        this.$router.push("/restaurants");
+      } catch (error) {
+        Toast.fire({
+          icon: "warning",
+          title: "請確認您輸入了正確的帳號密碼"
+        });
+        this.isProcessing = false;
+        console.log("error", error);
+      }
+
+      // // 如果 email 或 password 為空，則使用 Toast 提示
+      // // 然後 return 不繼續往後執行
+      // if (!this.email || !this.password) {
+      //   Toast.fire({
+      //     icon: "warning",
+      //     title: "請填入 email 和 password"
+      //   });
+      //   return;
+      // }
+
+      // this.isProcessing = true;
+      // authorizationAPI
+      //   .signIn({
+      //     email: this.email,
+      //     password: this.password
+      //   })
+      //   .then(response => {
+      //     console.log("response", response);
+      //     // 取得 API 請求後的資料
+      //     const { data } = response;
+      //     if (data.status !== "success") {
+      //       throw new Error(data.message);
+      //     }
+      //     // 將 token 存放在 localStorage 內
+      //     localStorage.setItem("token", data.token);
+
+      //     // 成功登入後轉址到餐聽首頁
+      //     // 因為成功登入就會轉址，所以不用還原 isProcessing 的狀態
+      //     this.$router.push("/restaurants");
+      //   })
+      //   .catch(error => {
+      //     Toast.fire({
+      //       icon: "warning",
+      //       title: "請確認您輸入了正確的帳號密碼"
+      //     });
+      //     // 因為登入失敗，所以要把按鈕狀態還原
+      //     this.isProcessing = false;
+      //     console.log("error", error);
+      //   });
     }
   }
 };
