@@ -127,6 +127,16 @@ export default {
       default: false
     }
   },
+  watch: {
+    initialRestaurant(newValue, oldValue) {
+      console.log("newValue", newValue, "oldValue", oldValue);
+
+      this.restaurant = {
+        ...this.restaurant,
+        ...newValue
+      };
+    }
+  },
   data() {
     return {
       restaurant: {
