@@ -8,5 +8,17 @@ export default {
       email,
       password
     })
-  }
+  },
+  signUp({ name, email, password, passwordCheck }) {
+    return apiHelper.post('/signup', {
+      name,
+      email,
+      password,
+      passwordCheck
+    })
+  },
+  // 為什麼不能這樣寫?
+  // signUp({ formData }) {    
+  //   return apiHelper.post('/signup',formData )
+  // },
 }

@@ -50,7 +50,7 @@
 
       <div class="form-label-group mb-3">
         <label for="password-check">Password Check</label>
-        <input0
+        <input
           id="password-check"
           v-model="passwordCheck"
           name="passwordCheck"
@@ -62,7 +62,11 @@
         />
       </div>
 
-      <button class="btn btn-lg btn-primary btn-block mb-3" type="submit">Submit</button>
+      <button
+        class="btn btn-lg btn-primary btn-block mb-3"
+        type="submit"
+        :disabled="isProcessing"
+      >Submit</button>
 
       <div class="text-center mb-3">
         <p>
@@ -76,24 +80,83 @@
 </template>
 
 <script>
+import authorizationAPI from "../apis/authorization";
+import { Toast } from "../utils/helpers";
+
 export default {
+  name: "SignUpPage",
   data() {
     return {
       name: "",
       email: "",
       password: "",
-      passwordCheck: ""
+      passwordCheck: "",
+      isProcessing: false
     };
   },
   methods: {
-    handleSubmit() {
-      const data = JSON.stringify({
-        name: this.name,
-        email: this.email,
-        password: this.password,
-        passwordCheck: this.passwordCheck
-      });
-      console.log("data", data);
+    async handleSubmit() {
+      // const data = JSON.stringify({
+      //   name: this.name,
+      //   email: this.email,
+      //   password: this.password,
+      //   passwordCheck: this.passwordCheck
+      // });
+      try {
+        if (!this.name) {
+          Toast.fire({
+            icon: "warning",
+            title: "請填寫名稱"
+          });
+          return;
+        } else if (!this.email) {
+          Toast.fire({
+            icon: "warning",
+            title: "請填寫信箱"
+          });
+          return;
+        } else if (!this.password) {
+          Toast.fire({
+            icon: "warning",
+            title: "請填寫密碼"
+          });
+          return;
+        } else if (this.password !== this.passwordCheck) {
+          Toast.fire({
+            icon: "warning",
+            title: "兩次輸入的密碼不相同"
+          });
+          return;
+        }
+        this.isProcessing = true;
+        // 為什麼不能用 formData 的形式? 是不是子層才能使用?
+        // const form = e.target;
+        // const formData = new FormData(form);
+        // for (let [name, value] of formData.entries()) {
+        //   console.log(name + ": " + value);
+        // }
+        // const { data } = await authorizationAPI.signUp({
+        //   formData
+        // });
+
+        const { data } = await authorizationAPI.signUp({
+          name: this.name,
+          email: this.email,
+          password: this.password,
+          passwordCheck: this.passwordCheck
+        });
+        if (data.status !== "success") {
+          throw new Error(data.message);
+        }
+        this.$router.push("/");
+      } catch (error) {
+        this.isProcessing = false;
+        Toast.fire({
+          icon: "error",
+          title: "無法註冊，請稍後再嘗試"
+        });
+        console.log("error", error);
+      }
     }
   }
 };
