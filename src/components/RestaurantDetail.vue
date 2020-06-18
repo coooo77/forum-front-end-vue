@@ -37,25 +37,25 @@
         v-if="restaurant.isFavorited"
         type="button"
         class="btn btn-danger btn-border mr-2"
-        @click.stop.prevent="deleteFavorite"
+        @click.stop.prevent="deleteFavorite(restaurant.id)"
       >移除最愛</button>
       <button
         v-else
         type="button"
         class="btn btn-primary btn-border mr-2"
-        @click.stop.prevent="addFavorite"
+        @click.stop.prevent="addFavorite(restaurant.id)"
       >加到最愛</button>
       <button
         v-if="restaurant.isLiked"
         type="button"
         class="btn btn-danger like mr-2"
-        @click.stop.prevent="deleteLike"
+        @click.stop.prevent="deleteLike(restaurant.id)"
       >Unlike</button>
       <button
         v-else
         type="button"
         class="btn btn-primary like mr-2"
-        @click.stop.prevent="addLike"
+        @click.stop.prevent="addLike(restaurant.id)"
       >Like</button>
     </div>
   </div>
@@ -63,6 +63,9 @@
 
 <script>
 import { emptyImageFilter } from "./../utils/mixins";
+import usersAPI from "../apis/users";
+import { Toast } from "../utils/helpers";
+
 export default {
   mixins: [emptyImageFilter],
   props: {
@@ -85,29 +88,89 @@ export default {
     }
   },
   methods: {
-    addFavorite() {
-      this.restaurant = {
-        ...this.restaurant, // 保留餐廳內原有資料
-        isFavorited: true
-      };
+    async addFavorite(id) {
+      try {
+        const { data } = await usersAPI.addFavorite({
+          restaurantId: id
+        });
+
+        if (data.status !== "success") {
+          throw new Error(data.message);
+        }
+
+        this.restaurant = {
+          ...this.restaurant, // 保留餐廳內原有資料
+          isFavorited: true
+        };
+      } catch (error) {
+        Toast.fire({
+          icon: "error",
+          title: "無法加入最愛，請稍後嘗試"
+        });
+      }
     },
-    deleteFavorite() {
-      this.restaurant = {
-        ...this.restaurant, // 保留餐廳內原有資料
-        isFavorited: false
-      };
+    async deleteFavorite(id) {
+      try {
+        const { data } = await usersAPI.deleteFavorite({
+          restaurantId: id
+        });
+
+        if (data.status !== "success") {
+          throw new Error(data.message);
+        }
+
+        this.restaurant = {
+          ...this.restaurant, // 保留餐廳內原有資料
+          isFavorited: false
+        };
+      } catch (error) {
+        Toast.fire({
+          icon: "error",
+          title: "無法移除最愛，請稍後嘗試"
+        });
+      }
     },
-    addLike() {
-      this.restaurant = {
-        ...this.restaurant,
-        isLiked: true
-      };
+    async addLike(id) {
+      try {
+        const { data } = await usersAPI.addLike({
+          restaurantId: id
+        });
+
+        if (data.status !== "success") {
+          throw new Error(data.message);
+        }
+
+        this.restaurant = {
+          ...this.restaurant,
+          isLiked: true
+        };
+      } catch (error) {
+        Toast.fire({
+          icon: "error",
+          title: "無法新增Like，請稍後嘗試"
+        });
+      }
     },
-    deleteLike() {
-      this.restaurant = {
-        ...this.restaurant,
-        isLiked: false
-      };
+    async deleteLike(id) {
+      try {
+        const { data } = await usersAPI.deleteLike({
+          restaurantId: id
+        });
+
+        if (data.status !== "success") {
+          throw new Error(data.message);
+        }
+
+        this.restaurant = {
+          ...this.restaurant,
+          isLiked: false
+        };
+      } catch (error) {
+        Toast.fire({
+          icon: "error",
+          title: "無法移除Like，請稍後嘗試"
+        });
+      }
     }
   }
 };

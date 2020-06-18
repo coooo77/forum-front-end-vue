@@ -56,4 +56,11 @@ export default {
       })
     },
   },
+  comments: {
+    delete(id) {
+      return apiHelper.delete(`/comments/${id}`, {
+        headers: { Authorization: `Bearer ${getToken()}` }
+      })
+    }
+  }
 }

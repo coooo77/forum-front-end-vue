@@ -23,17 +23,9 @@
 
 <script>
 import { fromNowFilter } from "./../utils/mixins";
-
-const dummyUser = {
-  currentUser: {
-    id: 1,
-    name: "管理者",
-    email: "root@example.com",
-    image: "https://i.pravatar.cc/300",
-    isAdmin: true
-  },
-  isAuthenticated: true
-};
+import { mapState } from "vuex";
+import AdminAPI from "../apis/admin";
+import { Toast } from "../utils/helpers";
 
 export default {
   name: "RestaurantComments",
@@ -43,19 +35,37 @@ export default {
       required: true
     }
   },
-  data() {
-    return {
-      currentUser: dummyUser.currentUser
-    };
+  computed: {
+    ...mapState(["currentUser"])
   },
   mixins: [fromNowFilter],
   methods: {
-    handleDeleteButtonClick(commentId) {
-      console.log("handleDeleteButtonClick", commentId);
-      // TODO: 請求 API 伺服器刪除 id 為 commentId 的評論
-      // 觸發父層事件 - $emit( '事件名稱' , 傳遞的資料 )
-      // U112 在父元件Restaurant.vue請求伺服器刪除資料 或 在子元件 RestaurantComments.vue請求伺服器刪除資料 兩者有差別嗎?
-      this.$emit("after-delete-comment", commentId);
+    async handleDeleteButtonClick(commentId) {
+      try {
+        if (!this.currentUser.isAdmin) {
+          Toast.fire({
+            icon: "error",
+            title: "需要管理員身分才能刪除留言"
+          });
+          return;
+        }
+        // TODO: 請求 API 伺服器刪除 id 為 commentId 的評論
+        const { data } = await AdminAPI.comments.delete(commentId);
+
+        if (data.status !== "success") {
+          throw new Error(data.message);
+        }
+
+        // 觸發父層事件 - $emit( '事件名稱' , 傳遞的資料 )
+        // U112 在父元件Restaurant.vue請求伺服器刪除資料 或 在子元件 RestaurantComments.vue請求伺服器刪除資料 兩者有差別嗎?
+        this.$emit("after-delete-comment", commentId);
+      } catch (error) {
+        console.error(error);
+        Toast.fire({
+          icon: "warning",
+          title: "無法刪除留言，請稍後嘗試"
+        });
+      }
     }
   }
 };
