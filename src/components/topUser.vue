@@ -1,8 +1,8 @@
 <template>
   <div class="col-3">
-    <a href="#">
+    <router-link :to="{name: 'user', params: {id: topUser.id}}">
       <img :src="topUser.image | emptyImage" width="180px" height="180px" />
-    </a>
+    </router-link>
     <h2>{{user.name}}</h2>
     <span class="badge badge-secondary">追蹤人數：{{topUser.followerCount}}</span>
     <p class="mt-3">

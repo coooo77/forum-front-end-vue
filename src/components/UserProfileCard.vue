@@ -36,10 +36,18 @@
             method="POST"
             style="display: contents;"
           >
-            <button type="submit" class="btn btn-danger" @click.stop.prevent="deleteFollowing">取消追蹤</button>
+            <button
+              type="submit"
+              class="btn btn-danger"
+              @click.stop.prevent="deleteFollowing(profile.id)"
+            >取消追蹤</button>
           </form>
           <form v-else action="/following/3" method="POST" style="display: contents;">
-            <button type="submit" class="btn btn-primary" @click.stop.prevent="addFollowing">追蹤</button>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              @click.stop.prevent="addFollowing(profile.id)"
+            >追蹤</button>
           </form>
           <p></p>
         </div>
@@ -50,51 +58,109 @@
 
 <script>
 import { emptyImageFilter } from "./../utils/mixins";
-const dummyUser = {
-  currentUser: {
-    id: 1,
-    name: "管理者",
-    email: "root@example.com",
-    image: "https://i.pravatar.cc/300",
-    isAdmin: true
-  },
-  isAuthenticated: true
-};
+import usersAPI from "../apis/users";
+import { Toast } from "../utils/helpers";
+import { mapState } from "vuex";
 
 export default {
   mixins: [emptyImageFilter],
   props: {
-    profile: {
+    initialProfile: {
       type: Object,
-      required: true
+      required: true,
+      default: () => ({
+        id: -1,
+        name: "",
+        email: "",
+        Comments: [],
+        FavoritedRestaurants: [],
+        Followings: [],
+        Followers: []
+      })
     },
-    isFollowed: {
+    initialIsFollowed: {
       type: Boolean,
-      required: true
+      required: false
     }
+  },
+  computed: {
+    ...mapState(["currentUser"])
+  },
+  created() {
+    this.fetchProfile();
+    this.fetchIsFollowed();
   },
   data() {
     return {
-      currentUser: {}
+      profile: {
+        id: -1,
+        name: "",
+        email: "",
+        Comments: [],
+        FavoritedRestaurants: [],
+        Followings: [],
+        Followers: []
+      },
+      isFollowed: false
     };
   },
   methods: {
-    fetchUser() {
-      this.currentUser = dummyUser.currentUser;
+    fetchProfile() {
+      this.profile = this.initialProfile;
     },
-    addFollowing() {
-      this.$emit("after-follow", {
-        isFollowed: true
-      });
+    fetchIsFollowed() {
+      this.isFollowed = this.initialIsFollowed;
     },
-    deleteFollowing() {
-      this.$emit("after-unfollow", {
-        isFollowed: false
-      });
+    async addFollowing(id) {
+      try {
+        const { data } = await usersAPI.addFollowing({ userId: id });
+
+        if (data.status !== "success") {
+          throw new Error(data.statusText);
+        }
+
+        this.$emit("after-follow", {
+          isFollowed: true
+        });
+      } catch (error) {
+        console.error(error);
+        Toast.fire({
+          icon: "error",
+          title: "無法追蹤，請稍後再試"
+        });
+      }
+    },
+    async deleteFollowing(id) {
+      try {
+        const { data } = await usersAPI.deleteFollowing({ userId: id });
+
+        if (data.status !== "success") {
+          throw new Error(data.statusText);
+        }
+
+        this.$emit("after-unfollow", {
+          isFollowed: false
+        });
+      } catch (error) {
+        console.error(error);
+        Toast.fire({
+          icon: "error",
+          title: "無法取消追蹤，請稍後再試"
+        });
+      }
     }
   },
-  created() {
-    this.fetchUser();
+  watch: {
+    initialProfile(newValue, oldValue) {
+      console.log("profile newValue", newValue, "oldValue", oldValue);
+
+      this.profile = newValue;
+    },
+    initialIsFollowed(newValue, oldValue) {
+      console.log("isFollowed newValue", newValue, "oldValue", oldValue);
+
+      this.isFollowed = newValue;
+    }
   }
 };
 </script>
