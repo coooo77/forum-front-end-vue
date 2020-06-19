@@ -54,7 +54,15 @@ export default {
   },
   data() {
     return {
-      profile: {},
+      profile: {
+        id: -1,
+        name: "",
+        email: "",
+        Comments: [],
+        FavoritedRestaurants: [],
+        Followings: [],
+        Followers: []
+      },
       isFollowed: false
     };
   },

@@ -87,8 +87,8 @@ export default {
     ...mapState(["currentUser"])
   },
   created() {
-    this.fetchProfile();
-    this.fetchIsFollowed();
+    Object.assign(this.profile, this.initialProfile);
+    this.isFollowed = this.initialIsFollowed;
   },
   data() {
     return {
@@ -105,12 +105,6 @@ export default {
     };
   },
   methods: {
-    fetchProfile() {
-      this.profile = this.initialProfile;
-    },
-    fetchIsFollowed() {
-      this.isFollowed = this.initialIsFollowed;
-    },
     async addFollowing(id) {
       try {
         const { data } = await usersAPI.addFollowing({ userId: id });

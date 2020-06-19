@@ -47,6 +47,11 @@ export default {
       headers: { Authorization: `Bearer ${getToken()}` }
     })
   },
+  update({ userId, formData }) {
+    return apiHelper.put(`/users/${userId}`, formData, {
+      headers: { Authorization: `Bearer ${getToken()}` }
+    })
+  },
   postComment({ text, restaurantId, id }) {
     return apiHelper.post('/comments', { text, restaurantId, id }, {
       headers: { Authorization: `Bearer ${getToken()}` }
